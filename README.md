@@ -60,8 +60,8 @@ The system consists of the following components:
 
 ## 3. Project Structure
 
+```text
 Report_Agent/
-│
 ├── src/
 │   ├── scraper.py
 │   ├── chunking.py
@@ -76,20 +76,18 @@ Report_Agent/
 │   └── prompts/
 │       ├── qa_prompt.txt
 │       ├── report_prompt.txt
-│       └── entity_prompt.txt
-│
+│       └── trend_prompt.txt
 ├── data/
 │   ├── raw/
 │   ├── processed/
 │   └── reports/
-│
 ├── examples/
 │   ├── sample_report.json
-│   └── trend_analysis.txt
-│
+│   ├── trend_analysis.txt
+│   └── sample_conversation.txt
 ├── Dockerfile
-├── requirements.txt
-└── .github/workflows/ci.yml
+└── requirements.txt
+
 
 
 ## 4. Installation and Setup

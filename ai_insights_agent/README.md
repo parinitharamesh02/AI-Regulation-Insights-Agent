@@ -56,57 +56,66 @@ The agent ingests trusted regulatory / policy content (primarily GOV.UK), cleans
 ├── requirements.txt
 ├── Dockerfile
 └── README.md
-
+```
 
 ---
+
 
 ## Setup
 
 Environment:
-Python 3.11 is recommended.
+Python **3.11** is recommended.
 
 Create and activate a virtual environment:
-
+```
 Windows (PowerShell):
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-
+```
 macOS / Linux:
+```
 python -m venv .venv
 source .venv/bin/activate
-
+```
 Install dependencies:
+```
 pip install -r requirements.txt
-
+```
 Download required NLTK data (first run only):
+```
 python -m nltk.downloader punkt
-
+```
 ---
-
 ## Configuration
 
 Set your OpenAI API key as an environment variable.
-
+```
 Windows:
 setx OPENAI_API_KEY "your-key-here"
-
+```
+```
 macOS / Linux:
 export OPENAI_API_KEY="your-key-here"
-
+```
 ---
 
 ## Running the System
 
 Run a reporting cycle:
+```
 python -m src.reporting.run_report
+```
 
 This performs ingestion, semantic chunking, indexing, report generation, and persists the report for later reuse.
 
 Run the Streamlit UI:
+```
 streamlit run src/app/ui_app.py
-
+```
 Run the CLI:
+```
 python -m src.app.cli
+```
 
 Example questions:
 - What’s new in UK AI regulation?
@@ -153,8 +162,9 @@ This improves retrieval relevance and answer grounding.
 ## Testing
 
 Run tests:
+```
 pytest
-
+```
 Tests cover semantic chunking behaviour, retrieval relevance, and report persistence.
 They also run automatically via GitHub Actions CI.
 
@@ -163,11 +173,14 @@ They also run automatically via GitHub Actions CI.
 ## Docker
 
 Build the image:
+```
 docker build -t ai-insights-agent .
+```
 
 Run the container:
+```
 docker run -p 8501:8501 ai-insights-agent
-
+```
 ---
 
 ## Example Outputs

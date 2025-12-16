@@ -1,219 +1,199 @@
-AI Regulation Insights Agent
+# AI Regulation Insights Agent
 
 A Generative AI system that autonomously collects UK AI regulation content from trusted sources, organises it into a semantic knowledge layer, generates periodic summary reports, and supports retrieval-grounded conversational question answering.
 
-The system is designed to demonstrate semantic chunking, vector retrieval, multi-prompt orchestration, context handling, and persistent memory over time.
+This project is designed to demonstrate:
+- **Semantic chunking** (meaning-based chunk boundaries)
+- **Vector retrieval** (evidence selection before generation)
+- **Multi-prompt orchestration** (reporting vs Q&A vs trend/change)
+- **Context handling** (tight, controlled context windows)
+- **Persistent memory** (reports saved across runs)
 
-Overview
+---
 
-This project implements an end-to-end Insights Agent focused on UK AI regulation and governance. It continuously ingests official policy and guidance content, structures it into semantically meaningful units, and enables both periodic reporting and conversational querying over the collected knowledge.
+## Overview
 
-Key capabilities include:
+The agent ingests trusted regulatory / policy content (primarily GOV.UK), cleans it, chunks it semantically, indexes chunks for retrieval, and then:
+- Generates **periodic reports** (summary + takeaways + entities)
+- Supports **conversational Q&A** grounded in retrieved chunks
+- Supports **trend / change detection** using report history as memory
 
-Automated data collection from trusted sources (primarily GOV.UK)
+---
 
-Semantic chunking based on sentence embeddings
+## Key Features
 
-Vector-based retrieval for grounded question answering
+- Data collection from trusted sources (GOV.UK focus)
+- Cleaned text + **semantic chunking** using sentence embeddings
+- Vector search retrieval (top-k evidence chunks for each query)
+- Periodic reports (100–150 word summary, 3–5 takeaways, entities)
+- Multi-prompt design:
+  - reporting prompt
+  - Q&A prompt
+  - trend/change prompt
+- Persisted memory via saved report artifacts
+- Streamlit UI (with visible retrieved evidence)
+- CLI mode for quick interaction
+- Unit tests + GitHub Actions CI
 
-Periodic report generation with summaries, takeaways, and entities
+---
 
-Multi-prompt LLM strategy for reporting, Q&A, and trend detection
+## Project Structure
 
-Persistent memory via saved reports
-
-Interactive chat interface (CLI and Streamlit UI)
-
-Project Structure
+```text
 .
 ├── src/
 │   ├── scraping/          # Data collection and parsing
-│   ├── processing/        # Cleaning and semantic chunking
+│   ├── processing/        # Cleaning + semantic chunking
 │   ├── retrieval/         # Vector indexing and search
-│   ├── reporting/         # Report generation and persistence
-│   ├── llm/               # Prompt templates and orchestration
+│   ├── reporting/         # Report generation
+│   ├── llm/               # LLM client + prompts
 │   ├── data/              # Storage utilities
 │   ├── app/               # CLI and Streamlit UI
 │   └── config.py          # Configuration and paths
 ├── tests/                 # Focused unit tests
-├── examples/              # Sample reports and outputs
+├── examples/              # Sample outputs (reports / conversations)
+├── scripts/               # Utilities (e.g. reporting cycle runner)
 ├── requirements.txt
 ├── Dockerfile
 └── README.md
+```
+
+---
 
 
-The codebase is structured so that ingestion, retrieval, generation, and memory are cleanly separated and easy to reason about.
+## Setup
 
-Setup
-1. Environment
-
-Python 3.11 is recommended.
+Environment:
+Python **3.11** is recommended.
 
 Create and activate a virtual environment:
-
+```
+Windows (PowerShell):
 python -m venv .venv
-source .venv/bin/activate   # macOS / Linux
-.venv\Scripts\activate      # Windows
-
-2. Install dependencies
+.\.venv\Scripts\Activate.ps1
+```
+macOS / Linux:
+```
+python -m venv .venv
+source .venv/bin/activate
+```
+Install dependencies:
+```
 pip install -r requirements.txt
-
-
-If you are running locally for the first time, download required NLTK data:
-
+```
+Download required NLTK data (first run only):
+```
 python -m nltk.downloader punkt
+```
+---
+## Configuration
 
-3. Configuration
+Set your OpenAI API key as an environment variable.
+```
+Windows:
+setx OPENAI_API_KEY "your-key-here"
+```
+```
+macOS / Linux:
+export OPENAI_API_KEY="your-key-here"
+```
+---
 
-Set your OpenAI API key as an environment variable:
+## Running the System
 
-export OPENAI_API_KEY="your-key-here"   # macOS / Linux
-setx OPENAI_API_KEY "your-key-here"     # Windows
-
-
-No other configuration is required for local execution.
-
-Running the System
-1. Data ingestion and report generation
-
-Run a reporting cycle to fetch articles, chunk them semantically, and generate a report:
-
+Run a reporting cycle:
+```
 python -m src.reporting.run_report
+```
 
+This performs ingestion, semantic chunking, indexing, report generation, and persists the report for later reuse.
 
-This will:
-
-Fetch recent regulatory content
-
-Perform semantic chunking
-
-Generate a structured report (summary, takeaways, entities)
-
-Persist the report for later use
-
-Generated reports are saved and reused as long-term memory.
-
-2. Conversational interface (CLI)
-
-To interact with the system via the command line:
-
-python -m src.app.cli
-
-
-You can ask both specific and open-ended questions such as:
-
-“What’s new in UK AI regulation?”
-
-“What’s happening nowadays?”
-
-“How has the picture changed since last week?”
-
-Answers are grounded in retrieved chunks and recent reports.
-
-3. Web interface (Streamlit)
-
-To launch the Streamlit UI:
-
+Run the Streamlit UI:
+```
 streamlit run src/app/ui_app.py
+```
+Run the CLI:
+```
+python -m src.app.cli
+```
 
+Example questions:
+- What’s new in UK AI regulation?
+- What’s happening nowadays?
+- How has the picture changed since last week?
 
-The UI provides:
+---
 
-A chat interface for conversational Q&A
+## Multi-Prompt Strategy
 
-Visibility into retrieved chunks used for grounding
+The system uses separate prompts for:
+- Reporting
+- Conversational question answering
+- Trend and change detection
 
-Access to generated reports and report history
+Each prompt has a single responsibility to keep reasoning predictable and explainable.
 
-This makes system behaviour observable and inspectable.
+---
 
-Multi-Prompt Strategy
+## Context Handling and Memory
 
-The system uses multiple prompts, each with a single responsibility:
+Short-term memory:
+Recent chat turns for conversational coherence.
 
-Reporting prompt
-Generates periodic summaries, key takeaways, and entities from newly ingested content.
+Long-term memory:
+Persisted report artifacts generated during periodic runs.
 
-Conversational Q&A prompt
-Answers user questions using only retrieved chunks and limited conversational context.
+Reports act as curated memory checkpoints and are reused for trend and change analysis.
 
-Trend / change-detection prompt
-Compares the latest report with previous reports to describe how the situation has evolved.
+---
 
-Prompt separation ensures predictable behaviour and avoids cross-task interference.
+## Semantic Chunking
 
-Context Handling and Memory
+Text is split based on meaning rather than fixed size:
+- Sentence-level tokenisation
+- Sentence embeddings
+- Semantic grouping with similarity thresholds
+- Controlled overlap for continuity
 
-Short-term memory
-Limited to recent conversational turns to maintain coherence.
+This improves retrieval relevance and answer grounding.
 
-Long-term memory
-Consists of persisted report artefacts generated during periodic runs.
+---
 
-Reports act as curated memory checkpoints and are explicitly reused for trend analysis and “what changed?” questions.
+## Testing
 
-The system avoids storing full chat transcripts as long-term memory to prevent noise accumulation.
-
-Semantic Chunking
-
-Text is chunked based on semantic meaning rather than fixed size:
-
-Cleaned text is split into sentences
-
-Each sentence is embedded
-
-Adjacent sentences are grouped when semantic similarity exceeds a threshold
-
-Controlled overlap is added to preserve continuity
-
-This produces chunks aligned with conceptual boundaries in regulatory text and improves retrieval quality.
-
-Testing
-
-Run the test suite with:
-
+Run tests:
+```
 pytest
+```
+Tests cover semantic chunking behaviour, retrieval relevance, and report persistence.
+They also run automatically via GitHub Actions CI.
 
+---
 
-The tests cover:
+## Docker
 
-Semantic chunking behaviour
-
-Retrieval relevance
-
-Report persistence and loading
-
-A GitHub Actions CI workflow runs these tests automatically on each push.
-
-Docker
-
-A Dockerfile is included to ensure consistent environments.
-
-To build the image:
-
+Build the image:
+```
 docker build -t ai-insights-agent .
+```
 
-
-To run the Streamlit UI:
-
+Run the container:
+```
 docker run -p 8501:8501 ai-insights-agent
+```
+---
 
-Example Outputs
+## Example Outputs
 
-The examples/ directory contains:
+The examples directory contains:
+- Sample generated reports
+- Example conversation transcripts
+- Trend and change detection outputs
 
-Sample generated reports
+---
 
-Example conversation transcripts
+## Notes
 
-Demonstrations of trend and change-detection behaviour
-
-These artefacts illustrate how memory and retrieval are reused across runs.
-
-Notes
-
-The system is intentionally lightweight but production-aligned.
-
-All components are modular and replaceable.
-
-Retrieval, generation, and memory are explicitly separated for clarity and robustness.
+- Lightweight but production-aligned
+- Modular and extensible
+- Clear separation between ingestion, retrieval, generation, and memory
